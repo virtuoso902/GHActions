@@ -1,0 +1,34 @@
+name: Test Self-Hosted Runner
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  test-runner:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 🏃 Runner Information
+        run: |
+          echo "✅ Running on self-hosted runner!"
+          echo "Runner name: ${RUNNER_NAME:-unknown}"
+          echo "Runner OS: ${RUNNER_OS:-Linux}"
+          echo "Runner Arch: ${RUNNER_ARCH:-X64}"
+          echo "Working Directory: $(pwd)"
+          
+      - name: 🐳 Test Docker Access
+        run: |
+          echo "Docker version:"
+          docker --version
+          echo ""
+          echo "Docker info:"
+          docker info | grep -E "(Server Version|Operating System|Architecture)"
+          
+      - name: 🎉 Success
+        run: |
+          echo "## Test Complete!"
+          echo "✅ Self-hosted runner is working correctly!"
+          echo "✅ Docker access verified!"
+          echo "✅ Ready to save GitHub Actions minutes!"
