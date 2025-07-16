@@ -1,297 +1,184 @@
-# CLAUDE.md - Optimized Edition
-*High-performance guidance for Claude Code development workflows*
+# CLAUDE.md - GitHub Actions Self-Hosted Runner
 
-## 🚀 Quick Reference Card (30-Second Lookup)
-**MANDATORY FIRST**: Read `memory-bank/startHere.md` → Follow `documentation-framework.md`  
-**Essential Commands**: `npm test` | `npm run lint` | `npm run build`  
-**Git Flow**: Memory-bank → `feature/issue-##-desc` → Security check → Tests → Commit → PR  
-**Testing Rule**: Write tests for ALL new components BEFORE committing  
-**Tool Selection**: Known file→Read | Pattern→Glob | Content→Grep | Unknown→Task  
-**Batch Operations**: Always combine tool calls in single message  
-**Security Check**: `git diff --cached | grep -E "(AIzaSy|sk-)" && echo "❌ API key!" && exit 1`  
-**Branch Check**: `[[ "$(git branch --show-current)" == "main" ]] && echo "❌ On main!" && exit 1`
+**Purpose:** Claude Code development guidance for GitHub Actions runner project  
+**Documentation:** Complete project documentation in [memory-bank/](memory-bank/) following framework standards  
+**Size:** 🟢 AI-friendly
 
----
+This file provides guidance to Claude Code (claude.ai/code) when working with the GitHub Actions self-hosted runner project.
 
-## 🚨 CRITICAL: Essential Workflows (READ FIRST)
+## Project Overview
 
-### Memory-Bank Workflow (MANDATORY FIRST STEP)
-**Every development task MUST start with:**
-1. **Reference** `memory-bank/startHere.md` for project context
-2. **Follow** `documentation-framework.md` for code comments
-3. **Update** memory-bank documentation before PR commit
-4. **Ensure** code comments reference memory-bank navigation
+This is a **Docker-based ephemeral GitHub Actions runner** designed to save GitHub Actions minutes by running workflows on local infrastructure. Each job runs in a fresh container that is destroyed after completion, ensuring maximum security.
 
-### Testing Workflow (MANDATORY)
-**All implementation MUST include comprehensive testing:**
-1. **Write tests** for ALL new components before committing
-2. **Run FULL test suite** (`npm test`) and fix ALL failures
-3. **Update existing tests** if changes break functionality  
-4. **Add test coverage** for edge cases and error scenarios
-5. **Validate**: `npm test && npm run lint && npm run build` (all must pass)
+## Quick Reference
 
-### Git Workflow (MANDATORY - NEVER COMMIT TO MAIN)
+**Start Runner:** `./scripts/start.sh`  
+**Stop Runner:** `./scripts/stop.sh`  
+**Check Status:** `./scripts/status.sh`  
+**Scale Runners:** `docker-compose up -d --scale runner=3`  
+**View Logs:** `docker-compose logs -f`
+
+## Architecture Highlights
+
+- **Ephemeral Containers**: Each job gets a fresh environment
+- **Docker-outside-of-Docker**: Secure container operations
+- **Auto-Registration**: Self-registers with GitHub
+- **Self-Cleanup**: Automatic deregistration on exit
+
+## Development Workflow
+
+### 1. Memory Bank First
+Always start by reading:
+- `memory-bank/startHere.md` - Navigation hub
+- `memory-bank/projectbrief.md` - Core requirements
+- Relevant feature documentation in `memory-bank/features/`
+
+### 2. Configuration
 ```bash
-# 1. Memory-bank consultation (MANDATORY FIRST)
-# Read memory-bank/startHere.md and relevant feature docs
-
-# 2. Branch compliance check
-CURRENT_BRANCH=$(git branch --show-current)
-[[ "$CURRENT_BRANCH" == "main" ]] && echo "❌ On main!" && exit 1
-
-# 3. Create feature branch
-git checkout main && git pull origin main
-git checkout -b feature/issue-number-description
-
-# 4. Work → Test → Security → Commit
-# [Implement with memory-bank references in code]
-# [Write/update tests for all components]
-git add .
-# Security validation:
-git diff --cached | grep -E "(AIzaSy[A-Za-z0-9_-]{33}|sk-[A-Za-z0-9]{32,})" && echo "❌ API key!" && exit 1
-git commit -m "Your message (fixes #123)"
-
-# 5. Push and create PR
-git push -u origin feature/issue-number-description
-gh pr create --title "Title" --body "Description"
+# Copy and configure
+cp .env.example .env
+# Add GITHUB_TOKEN and GITHUB_REPOSITORY/ORGANIZATION
 ```
 
-### Tool Selection Decision Tree
-```
-Task Type → Tool Choice:
-├── Known file path → Read tool
-├── File patterns (*.ts, **/*.tsx) → Glob tool  
-├── Content search (regex) → Grep tool
-├── Unknown keyword/location → Task tool
-└── Multiple files → Batch in single message
-```
-
-### Security Validation (ONE-LINER)
+### 3. Testing Changes
 ```bash
-# Pre-commit security check (run before every commit)
-git status --porcelain | grep "^\.env$" && echo "❌ .env staged!" && exit 1; git diff --cached | grep -E "(AIzaSy[A-Za-z0-9_-]{33}|sk-[A-Za-z0-9]{32,})" && echo "❌ API key detected!" && exit 1; echo "✅ Safe to commit"
+# Build image
+docker-compose build
+
+# Test locally
+docker-compose up
+
+# Verify registration in GitHub
+# Settings > Actions > Runners
 ```
 
----
+### 4. Documentation Updates
+- Update relevant files in `memory-bank/features/`
+- Follow Domain-Driven Documentation structure
+- Use file size indicators (🟢🟡🔴)
 
-## 🛠️ Core Development Commands
-
-### Setup & Development
-```bash
-npm install                    # Setup
-npm run dev:https             # Main development (HTTPS preferred)
-npm run create-cert           # SSL setup
-```
-
-### Testing & Quality
-```bash
-npm test                      # Unit tests (MANDATORY before commit)
-npm test:coverage            # Coverage report  
-npm test:e2e                 # End-to-end tests
-npm run lint                 # Code quality (MANDATORY before commit)
-npm run typecheck            # TypeScript validation
-npm run build                # Production build (MANDATORY before commit)
-```
-
-### Database & Services
-```bash
-supabase start               # Local Supabase
-supabase stop               # Stop services
-```
-
----
-
-## 📋 TodoWrite Usage (Smart Templates)
-
-### When to Use TodoWrite
-**MANDATORY for**: 3+ step tasks, Git operations, security changes, multi-agent work  
-**Skip for**: Single tasks, <30 second work, conversations
-
-### Quick Templates
-
-#### Git Workflow (Use for most development tasks)
-```bash
-# One-liner template creation:
-TodoWrite: Memory-bank reference → Documentation framework → Git compliance → Feature branch → Implementation → Test ALL components → Documentation update → Security validation → Full test suite → Lint/build validation → PR creation
-```
-
-#### Multi-Agent Coordination
-```bash  
-# One-liner template:
-TodoWrite: Check existing agent work → Create team/[agent]/issue-X branch → Implement assigned portion → Document integration → Validate no conflicts
-```
-
-#### Security-Sensitive Changes
-```bash
-# One-liner template:
-TodoWrite: Security review → Secure implementation → Security validation → Credential check → Dummy data testing
-```
-
----
-
-## 🚨 Error Recovery (Quick Fixes)
-
-### Git Issues
-| Problem | Quick Fix |
-|---------|-----------|
-| **Committed to main** | `git checkout -b backup-$(date +%s) && git checkout main && git reset --hard HEAD~1` |
-| **Merge conflicts** | `git stash && git rebase origin/main && git stash pop` |
-| **Security scan fail** | `git restore --staged .env* && git restore --staged . # remove credentials` |
-
-### CI/CD Issues  
-| Problem | Quick Fix |
-|---------|-----------|
-| **Test failures** | `npm test 2>&1 \| tee test.log && grep -E "(FAIL\|Error)" test.log` |
-| **Build failures** | `npm run typecheck && npm run lint && npm install && npm run build` |
-| **Env issues** | `cp .env.example .env.local` |
-
-### Escalation Triggers
-Escalate to human if: credentials exposed, main corrupted, agents deadlocked, production affected, can't resolve in 3 attempts
-
----
-
-## 🤝 Multi-Agent Coordination (Condensed)
-
-### Quick Agent Detection
-```bash
-gh pr list --state open | grep -E "(claude|gemini|cursor)"  # Active agents
-gh issue list --state open | grep -E "(agent|bot|ai)"       # Agent work
-```
-
-### Branch Patterns
-- **Solo work**: `feature/issue-123-description`
-- **Agent-specific**: `team/claude/issue-123-auth`  
-- **Coordination**: `coord/issue-123-planning`
-- **Integration**: `integration/issue-123-complete`
-
-### Coordination Patterns
-1. **Parallel**: Different components, sync via issue comments
-2. **Sequential**: Agent 1 → PR merge → Agent 2 → PR merge → Agent 3  
-3. **Handoff**: Agent 1 creates PR, Agent 2 continues on same branch
-
-### Conflict Prevention
-```bash
-# Before starting work:
-ISSUE_NUM="123"
-gh pr list --search "fixes #$ISSUE_NUM" --state open
-git branch -r | grep -E "(issue-$ISSUE_NUM|$ISSUE_NUM-)"
-```
-
----
-
-## 🏢 Architecture Context
-
-### Tech Stack Essentials
-- **Framework**: Next.js 14 (App Router)
-- **Auth**: Firebase Auth → Supabase mapping  
-- **Database**: Supabase (PostgreSQL + RLS)
-- **Testing**: Vitest (unit) + Playwright (E2E)
-- **State**: @tanstack/react-query
-
-### Key Patterns
-- **File Structure**: `app/` (routes), `components/` (by feature), `lib/` (utils)
-- **Auth Flow**: Firebase OAuth → `/api/auth/map-firebase-to-supabase` → Supabase JWT
-- **New Feature**: Create in `app/apps/[name]/` → components in `components/[name]/` → spec in `memory-bank/features/`
-- **HTTPS Dev**: `https://localhost:3001` (required for auth)
-
----
-
-## 🔒 Security Essentials
+## Security Guidelines
 
 ### Never Commit
-- Real API keys, `.env` files, hardcoded credentials
-- Localhost fallbacks in production code
+- `.env` files with real tokens
+- Hardcoded credentials
+- Production secrets
 
-### Always Do  
-- Use dummy values for CI/CD
-- Reference `.env.example`
-- Validate environment variables in production
-- Fail fast on missing production env vars
+### Always Do
+- Use `.env.example` as template
+- Validate environment variables
+- Test with dummy values in CI
 
-### Production Environment Pattern
-```typescript
-// ✅ CORRECT - Fail fast
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-if (!supabaseUrl) {
-  if (process.env.NODE_ENV === 'test') return createClient('localhost:54321', 'dummy');
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL required');
-}
-
-// ❌ NEVER - Silent fallbacks
-process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://localhost:54321'
+### Token Management
+```bash
+# Validate token format (not value)
+[[ "$GITHUB_TOKEN" =~ ^gh[ps]_[a-zA-Z0-9]{36}$ ]] || echo "Invalid token format"
 ```
+
+## Tool Usage Patterns
+
+### File Operations
+```bash
+# Read configuration
+Read: .env.example, docker-compose.yml, Dockerfile
+
+# Find scripts
+Glob: scripts/*.sh
+
+# Search for patterns
+Grep: "GITHUB_TOKEN" --include="*.{sh,yml}"
+```
+
+### Docker Operations
+```bash
+# Check running containers
+docker-compose ps
+
+# View real-time logs
+docker-compose logs -f runner
+
+# Inspect container
+docker-compose exec runner bash
+```
+
+## Common Tasks
+
+### Adding New Features
+1. Create feature branch: `git checkout -b feature/runner-enhancement`
+2. Update Docker configuration if needed
+3. Test thoroughly with ephemeral runners
+4. Update memory-bank documentation
+5. Create PR with testing evidence
+
+### Troubleshooting
+1. Check `./scripts/status.sh` output
+2. Review `docker-compose logs`
+3. Verify GitHub token permissions
+4. Check network connectivity to GitHub
+
+### Scaling Runners
+```bash
+# Scale to 5 runners
+docker-compose up -d --scale runner=5
+
+# Monitor resource usage
+docker stats
+
+# Adjust based on workload
+```
+
+## Project Structure
+
+```
+/github/GHActions/
+├── docker/
+│   ├── Dockerfile          # Runner container definition
+│   └── entrypoint.sh      # Container startup script
+├── scripts/
+│   ├── start.sh           # Start runners
+│   ├── stop.sh            # Stop runners
+│   └── status.sh          # Check status
+├── docker-compose.yml     # Service orchestration
+├── .env.example          # Configuration template
+└── memory-bank/          # Documentation
+    ├── startHere.md      # Navigation hub
+    └── features/         # Feature-specific docs
+```
+
+## Integration with CI/CD
+
+### Using in Workflows
+```yaml
+jobs:
+  build:
+    runs-on: self-hosted  # Or use labels
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Running on self-hosted runner!"
+```
+
+### Label Strategy
+- `self-hosted` - Required label
+- `linux` - OS identifier  
+- `x64` - Architecture
+- `ephemeral` - Indicates single-use
+- `docker` - Container-based
+
+## Performance Considerations
+
+- **Startup Time**: ~20-30 seconds per container
+- **No Caching**: Each job starts fresh (security trade-off)
+- **Concurrent Jobs**: Limited by host resources
+- **Network**: Requires stable GitHub connectivity
+
+## Best Practices
+
+1. **Always use ephemeral mode** for security
+2. **Monitor resource usage** when scaling
+3. **Rotate tokens** every 90 days
+4. **Test workflows** on self-hosted before production
+5. **Document runner-specific** requirements in workflows
 
 ---
 
-## 🎯 Performance Optimization
-
-### Tool Usage Best Practices
-- **Batch tool calls**: Single message with multiple Read/Glob/Grep operations
-- **Use specific tools**: Don't use Task for known file paths
-- **Glob efficiently**: `**/*.{ts,tsx}` not `*`
-- **Filter searches**: Use `--include` and `--path` parameters
-
-### Common Workflows (Optimized)
-```bash
-# Architecture Discovery (parallel):
-Read: package.json + Glob: **/*.config.* + Read: [key configs]
-
-# Feature Planning (parallel):  
-Grep: "pattern" --include="*.{ts,tsx}" + Read: [matching files] + Glob: **/__tests__/*.test.*
-
-# Bug Investigation (sequential):
-Grep: "error message" → Read: [error files] → Bash: debug commands
-```
-
-### Context Management
-- **Session limits**: Create TodoWrite summary before limits
-- **Priority context**: Current task > Dependencies > Background
-- **State reconstruction**: `git log --oneline -10` + `git status` + `gh issue view $ISSUE`
-
----
-
-## 📝 Quick Templates & References
-
-### GitHub Issue Lifecycle
-```bash
-gh issue list                              # Check existing
-gh issue create --web                      # Create with template  
-gh issue view 123                          # View details
-gh issue close 123 --comment "Done in PR" # Close
-```
-
-### Branch Naming Conventions
-```bash
-feature/issue-number-description    # New functionality
-fix/issue-number-description        # Bug fixes  
-quick/issue-number-description      # <30 min tasks
-team/agent/issue-number-description # Multi-agent work
-```
-
-### Documentation Updates (MANDATORY)
-- Update `memory-bank/features/[area]/technical-design.md` for logic changes
-- Update `memory-bank/features/[area]/user-experience.md` for UX changes  
-- Reference memory-bank in code comments using navigation patterns
-- Follow `documentation-framework.md` standards
-
----
-
-## 🧠 Context & Memory Management
-
-### Session Continuation
-**Approaching limits**: TodoWrite summary → Document state → Update memory-bank
-
-### Multi-Session Tracking  
-**Long tasks**: Issue comments for progress → Update labels → Create handoff docs
-
-### Quick Context Rebuild
-```bash
-git log --oneline -10 --author="Claude"     # Recent work
-git status && git diff HEAD~1               # Current state  
-gh issue view $ISSUE_NUMBER --comments      # Context
-ls -la *.md | grep -E "(SESSION|HANDOFF)"   # Temp docs
-```
-
----
-
-*This optimized version reduces lookup time by 60% while maintaining all critical functionality and project-specific requirements.*
+This project prioritizes **security** and **simplicity** over performance optimizations like caching. The ephemeral nature ensures a clean, secure environment for every job execution.
