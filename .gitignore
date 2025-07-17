@@ -48,3 +48,6 @@ next-env.d.ts
 # Playwright E2E test reports and results - should not be committed
 playwright-report/
 test-results/
+
+# Ignore other repositories that might be accidentally copied here
+claude-global-config/
