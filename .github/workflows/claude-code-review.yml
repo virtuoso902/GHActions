@@ -1,0 +1,72 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # Review ALL file changes - any change can impact project functionality
+
+jobs:
+  claude-review:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # Repository-specific review prompt
+          direct_prompt: |
+            Please review this pull request with focus on the following areas:
+            
+            **Critical Review Areas:**
+            1. **Code Quality**: Clean, readable, maintainable code following best practices
+            2. **Security**: Identify potential security vulnerabilities, credential exposure, API key leaks
+            3. **Performance**: Assess performance implications and optimization opportunities
+            4. **Testing**: Evaluate test coverage, edge cases, and test quality
+            5. **Documentation**: Check for adequate documentation and code comments
+            6. **Architecture**: Ensure changes align with project architecture and patterns
+            
+            **Language-Specific Focus:**
+            - **JavaScript/TypeScript**: Type safety, async/await patterns, error handling
+            - **Python**: PEP 8 compliance, proper exception handling, type hints
+            - **Shell Scripts**: Error handling, security practices, documentation headers
+            - **Docker**: Security best practices, optimization, multi-arch support
+            - **Configuration Files**: Validation, schema compliance, security implications
+            
+            **Security Validation (CRITICAL):**
+            - Check for hardcoded credentials, API keys, or secrets
+            - Validate environment variable usage patterns
+            - Ensure no sensitive data in logs or comments
+            - Check for proper input validation and sanitization
+            
+            **Best Practices to Enforce:**
+            - Follow established coding standards and conventions
+            - Ensure proper error handling and logging
+            - Check for potential race conditions or concurrency issues
+            - Validate dependency management and security
+            - Ensure backwards compatibility considerations
+            
+            **Integration Considerations:**
+            - Will this work with existing CI/CD pipelines?
+            - Are there any breaking changes that need documentation?
+            - Does this follow the repository's established patterns?
+            
+            Be thorough but constructive. Focus on actionable feedback that improves code quality and security.
+
+          # Use sticky comments to reuse the same comment on subsequent pushes
+          use_sticky_comment: true
+          
+          # Allow Claude to run basic validation tools
+          allowed_tools: "Bash(npm test),Bash(npm run lint),Bash(npm run typecheck),Bash(python -m pytest),Bash(flake8),Bash(black --check),Bash(shellcheck)"
